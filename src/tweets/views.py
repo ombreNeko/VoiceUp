@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from tweets.models import Tweet
@@ -17,7 +18,7 @@ from django.urls import reverse_lazy
 class TweetCreateView(LoginRequiredMixin, FormUserNeededMixin, CreateView):
     form_class = TweetModelForm
     template_name = 'tweets/create_view.html'
-    success_url = '/tweet/create'
+    # success_url = reverse_lazy('tweet:detail')
     # login_url = '/admin/'
     
 
@@ -42,14 +43,14 @@ class TweetUpdateView(LoginRequiredMixin, UserOwnerMixin, UpdateView):
     queryset = Tweet.objects.all()
     form_class = TweetModelForm
     template_name = 'tweets/update_view.html'
-    success_url = '/tweet/'
+    # success_url = '/tweet/'
 
 
 
 # Delete
 class TweetDeleteView(DeleteView,LoginRequiredMixin):
     model = Tweet
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('tweet:list')
     template_name = 'tweets/delete_confirm.html'
 
 
@@ -65,7 +66,19 @@ class TweetDetailView(DetailView):
 
 class TweetListView(ListView):
     template_name = 'tweets/list_view.html'
-    queryset = Tweet.objects.all()
+    # queryset = Tweet.objects.all()
+
+    def get_queryset(self, *args, **kwargs):
+        qs = Tweet.objects.all()
+        print(self.request.GET)
+        query = self.request.GET.get('q')
+        if query is not None:
+            qs = qs.filter(
+                Q(content__icontains = query) |
+                Q(user__username__icontains = query) 
+            )    
+            print(qs)
+        return qs
 
     def get_context_data(self, *args, **kwargs) :
         context = super(TweetListView, self).get_context_data(*args,**kwargs)

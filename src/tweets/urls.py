@@ -6,6 +6,7 @@ from tweets.views import (
     TweetUpdateView,
     TweetDeleteView
 )
+app_name = 'tweet'
 
 urlpatterns = [
     path('', TweetListView.as_view(), name = 'list'),

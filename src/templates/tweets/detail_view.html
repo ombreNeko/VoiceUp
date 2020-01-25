@@ -1,4 +1,14 @@
-{{ object.content }} <br>
-{{ object.user }} <br>
-{{ object.time_stamp }} <br>
-{{ object.time_stamp|timesince }} <br>
+{% extends 'base.html' %}
+
+{% block title %}
+     View Tweet | {{block.super}}
+{% endblock %}
+
+{% block content %}
+    {{ object.content }} <br>
+    {{ object.user }} <br>
+    {{ object.time_stamp }} <br>
+    {{ object.time_stamp|timesince }} <br>
+     
+{% endblock %}
+
