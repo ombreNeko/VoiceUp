@@ -5,21 +5,35 @@
 {% endblock %}
 
 {% block content %}
-    {% include "tweets/search_form.html" %} <br>
-    
-    {% for object in object_list %}
-        <p>
-            {{ object.content }} <br>
-            {{ object.user }} <br>
-            {{ object.time_stamp }} <br>
-            {{ object.time_stamp|timesince }} ago<br>
-        </p>
-    {% empty %}
-        {% if qs is empty %}
-            <p>No tweets found</p> 
-        {% else %}
-            <p>No tweets yet</p> 
-        {% endif %}
-    {% endfor %}
+
+    <div class="row justify-content-sm-center">
+        <div class="col-sm-8">
+
+
+            {% include "tweets/search_form.html" %} <br>
+            
+            {% for object in object_list %}
+        
+                <div class="media">
+                    {% if object.image %}
+                    <img class="mr-3" src="..." alt="Generic placeholder image">
+                    {% endif %}
+                    <div class="media-body">
+                        {{ object.content }} <br>
+                            via {{ object.user }} | {{ object.time_stamp|timesince }} ago | <a href="{{ object.get_absolute_url}}">View</a>
+                    </div>
+                </div>
+            <hr>
+        
+            {% empty %}
+                {% if qs is empty %}
+                    <p>No tweets found</p> 
+                {% else %}
+                    <p>No tweets yet</p> 
+                {% endif %}
+            {% endfor %}
+
+        </div>
+    </div>
 
 {% endblock %}
