@@ -5,10 +5,15 @@
 {% endblock %}
 
 {% block content %}
-    {{ object.content }} <br>
-    {{ object.user }} <br>
-    {{ object.time_stamp }} <br>
-    {{ object.time_stamp|timesince }} <br>
+    <div class="row">
+        <div class="col-md-4" >
+            <h1>{{ object.user }}</h1>
+        </div>
+        <div class="col-md-8">
+            {{ object.content }} <br>
+            {{ object.time_stamp|timesince }} <br>
+        </div>
+    </div>
      
 {% endblock %}
 

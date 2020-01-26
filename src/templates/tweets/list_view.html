@@ -1,39 +1,112 @@
 {% extends 'base.html' %}
 
+{% block script %}
+    <script>
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            console.log("in getpara")
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        $(document).ready(function(){
+            var query = getParameterByName('q')
+            var tweetList = [];
+
+            function parseTweets(){
+                if(tweetList == 0){
+                    $("#tweet-container").text("No tweets found.")
+                }else{
+                    $.each(tweetList,function(key,value){
+                        var tweetContent = value.content;
+                        var tweetUser = value.user;
+                        var tweetKey = key;
+                        $("#tweet-container").append(
+                        "<div class=\"media\"><div class=\"media-body\">" + tweetContent + "<br> via " + tweetUser.username + " | " + "<a href='#'>View</a>" + "</div></div><hr>"
+                        )
+                    })
+                }
+            }
+
+            function fetchTweets(){
+                console.log("fetching..")
+                $.ajax({
+                    url:"/api/tweet/",
+                    method:"GET",
+                    data: {
+                        "q": query,
+                    },
+                    success: function(data){
+                                tweetList = data;
+                                parseTweets();
+                    },
+                    error: function(data){
+                        console.log("error")
+                        console.log(data)
+                    }
+                })
+            }
+            fetchTweets()
+
+            $("#tweet-form").submit(function(event){
+                event.preventDefault()
+                var this_ = $(this)
+                var formData = this_.serialize()
+                $.ajax({
+                    url:"/api/tweet/create/",
+                    method:"POST",
+                    data: formData,
+                    success: function(data){
+                        console.log(data)
+                        fetchTweets()
+
+                    },
+                    error: function(data){
+                        console.log("error")
+                        console.log(data.statusText)
+                        console.log(data.status)
+
+                    }
+                })
+
+            })
+        });
+
+    
+    </script>
+
+{% endblock %}
+
 {% block title %}
      All Tweets | {{block.super}}
 {% endblock %}
 
 {% block content %}
 
-    <div class="row justify-content-sm-center">
-        <div class="col-sm-8">
+    <div class="row">
+        <div class="col-md-4";>
+            <h1>{{ request.user }}</h1> 
+        </div>
+        <div class="col-md-8">
 
-
-            {% include "tweets/search_form.html" %} <br>
+            {% if not request.GET.q %}
+                <div >
+                    {% include 'tweets/components/form.html' with form=create_form action_url=create_url btn_title='Tweet' form_id='tweet-form' %}
             
-            {% for object in object_list %}
-        
-                <div class="media">
-                    {% if object.image %}
-                    <img class="mr-3" src="..." alt="Generic placeholder image">
-                    {% endif %}
-                    <div class="media-body">
-                        {{ object.content }} <br>
-                            via {{ object.user }} | {{ object.time_stamp|timesince }} ago | <a href="{{ object.get_absolute_url}}">View</a>
-                    </div>
                 </div>
-            <hr>
+                <hr>
         
-            {% empty %}
-                {% if qs is empty %}
-                    <p>No tweets found</p> 
-                {% else %}
-                    <p>No tweets yet</p> 
-                {% endif %}
-            {% endfor %}
+            {% endif %}
 
+            <div id="tweet-container">
+
+            </div>
         </div>
     </div>
+    
 
 {% endblock %}

@@ -3,11 +3,14 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from voiceup.views import home
+from tweets.views import TweetListView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home, name= "home"),
-    path('tweet/', include('tweets.urls', namespace= 'tweet'))
+    path('', TweetListView.as_view(), name= "home"),
+    path('tweet/', include('tweets.urls', namespace= 'tweet')),
+    path('api/tweet/', include('tweets.api.urls', namespace= 'tweet-api'))
+
 ]
 
 if settings.DEBUG:
