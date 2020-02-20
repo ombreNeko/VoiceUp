@@ -2,6 +2,7 @@
 
 {% block script %}
     <script>
+
         function getParameterByName(name, url) {
             if (!url) url = window.location.href;
             name = name.replace(/[\[\]]/g, '\\$&');
@@ -17,17 +18,27 @@
             var query = getParameterByName('q')
             var tweetList = [];
 
+            function attatchTweet(tweetValue,prepend){
+                var tweetContent = tweetValue.content;
+                var dateDisplay = tweetValue.date_display
+                var tweetUser = tweetValue.user;
+                var tweetFormattedHTML = "<div class=\"media\"><div class=\"media-body\">" + tweetContent + "<br> via " + tweetUser.username + " | " +dateDisplay +" | " + "<a href='#'>View</a>" + "</div></div><hr>"
+                if(prepend==true){
+                    $("#tweet-container").prepend(tweetFormattedHTML)
+                }else{
+                    $("#tweet-container").append(tweetFormattedHTML)
+                }
+              
+            }
+                
+
             function parseTweets(){
                 if(tweetList == 0){
                     $("#tweet-container").text("No tweets found.")
                 }else{
                     $.each(tweetList,function(key,value){
-                        var tweetContent = value.content;
-                        var tweetUser = value.user;
-                        var tweetKey = key;
-                        $("#tweet-container").append(
-                        "<div class=\"media\"><div class=\"media-body\">" + tweetContent + "<br> via " + tweetUser.username + " | " + "<a href='#'>View</a>" + "</div></div><hr>"
-                        )
+                        var tweetKey = key
+                        attatchTweet(value)
                     })
                 }
             }
@@ -61,8 +72,10 @@
                     method:"POST",
                     data: formData,
                     success: function(data){
+                        this_.find("input[type=text],textarea").val("")
+                        attatchTweet(data,true)
                         console.log(data)
-                        fetchTweets()
+                        // fetchTweets()
 
                     },
                     error: function(data){

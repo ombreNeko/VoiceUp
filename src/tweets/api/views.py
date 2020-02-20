@@ -8,7 +8,7 @@ from rest_framework import permissions
 class TweetListAPIView(generics.ListAPIView):
     serializer_class = TweetModelSerializer
     def get_queryset(self, *args, **kwargs):
-        qs = Tweet.objects.all()
+        qs = Tweet.objects.all().order_by("-time_stamp")
         print(self.request.GET)
         query = self.request.GET.get('q')
         if query is not None:
